@@ -1,0 +1,5 @@
+nohup python train.py --max_features 20000 --maxlen 100 --embedding_dims 128 --dropout 0.5 --model_name bidirectional_lstm --batch_size 128  --lstm_output_size 64 --nb_epoch 100 > ./logs/bidirectional_lstm &
+# nohup python train.py --max_features 20000 --maxlen 100 --embedding_dims 128 --dropout 0.25 --model_name cnn_lstm --batch_size 128 --nb_filter 64 --filter_length 5 --nb_epoch 100 --pool_length 4 --lstm_output_size 70 > ./logs/cnn_lstm &
+# nohup python train.py --max_features 5000 --maxlen 400 --embedding_dims 50 --dropout 0.2 --model_name cnn --batch_size 128 --nb_filter 250 --filter_length 3 --nb_epoch 100 --hidden_dims 250 > ./logs/cnn &
+# nohup python train.py --max_features 20000 --maxlen 100 --embedding_dims 128 --dropout 0.2 --model_name lstm --batch_size 128 --nb_epoch 100 --lstm_output_size 128 > ./logs/lstm &
+# nohup python train.py --max_features 20000 --maxlen 80 --embedding_dims 128 --dropout 0.2 --model_name model --batch_size 128 --nb_filter 64 --filter_length 5 --nb_epoch 10 --pool_length 4 --lstm_output_size 70 > ./logs/lstm &
