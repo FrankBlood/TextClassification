@@ -10,6 +10,10 @@ from keras.layers import Input, Embedding, Dense, LSTM, Convolution1D, GlobalMax
 
 from config import Config
 
+def cnn_based_rnn(config):
+    # TODO: cnn based attentive rnn model
+    pass
+
 def bidirectional_lstm(config):
     """ Bidirectional LSTM model
 
