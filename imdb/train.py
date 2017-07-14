@@ -17,10 +17,11 @@ FLAGS = None
 def train(config):
     data_loader = Data_Loader()
     pre_process = Pre_Process()
-    X_train, y_train, X_test, y_test = pre_process.process(config, data_loader)
+    # X_train, y_train, X_test, y_test = pre_process.process(config, data_loader)
+    X_train, y_train, X_test, y_test, word_index = pre_process.process_from_file(config, data_loader)
+    embedding_matrix = config.get_embedding_matrix(word_index)
 
     print('Train...')
-
 
     if config.model_name == 'bidirectional_lstm':
         model = bidirectional_lstm(config)
@@ -33,6 +34,9 @@ def train(config):
 
     elif config.model_name == 'lstm':
         model = lstm(config)
+
+    elif config.model_name == 'cnn_based_rnn':
+        model = cnn_based_rnn(config, embedding_matrix)
 
     else:
         print("What the FUCK!")
@@ -72,6 +76,10 @@ def main():
     parser.add_argument('--nb_epoch', type=int, default=None, help='nb epoch.')
     parser.add_argument('--pool_length', type=int, default=None, help='pool length.')
     parser.add_argument('--lstm_output_size', type=int, default=None, help='lstm output size.')
+    parser.add_argument('--embedding_file', type=str, default=None, help='embeddin file.')
+    parser.add_argument('--word_vocb_path', type=str, default=None, help='word vocb path.')
+    parser.add_argument('--train_path', type=str, default=None, help='train path.')
+    parser.add_argument('--test_path', type=str, default=None, help='train path.')
     sys.stdout.flush()
     FLAGS, unparsed = parser.parse_known_args()
     print('FLAGS', FLAGS)
@@ -81,7 +89,9 @@ def main():
                     nb_filter=FLAGS.nb_filter, filter_length=FLAGS.filter_length,
                     hidden_dims=FLAGS.hidden_dims, nb_epoch=FLAGS.nb_epoch,
                     dropout=FLAGS.dropout, pool_length=FLAGS.pool_length,
-                    lstm_output_size=FLAGS.lstm_output_size, model_name=FLAGS.model_name)
+                    lstm_output_size=FLAGS.lstm_output_size, model_name=FLAGS.model_name,
+                    embedding_file=FLAGS.embedding_file, word_vocb_path=FLAGS.word_vocb_path,
+                    trian_path=FLAGS.train_path, test_path=FLAGS.test_path)
     config.print_config()
     train(config)
 
