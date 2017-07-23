@@ -23,6 +23,7 @@ def cnn_based_rnn(config, embedding_matrix=None):
     :return: The model
     """
 
+    print("Build CNN based Attentive RNN...")
     if embedding_matrix == None:
         # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
         # numpy_rng = np.random.RandomState(4321)
@@ -91,23 +92,50 @@ def cnn_based_rnn(config, embedding_matrix=None):
     model.summary()
     return model
 
-def bidirectional_lstm(config):
+def bidirectional_lstm(config, embedding_matrix=None):
     """ Bidirectional LSTM model
 
     :param config:
     :return: the model
     """
     print('Build Bidirectional LSTM model...')
-    model = Sequential()
-    model.add(Embedding(config.max_features, config.embedding_dims, input_length=config.maxlen))
-    model.add(Bidirectional(LSTM(config.lstm_output_size)))
-    model.add(Dropout(config.dropout))
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile('nadam', 'binary_crossentropy', metrics=['accuracy'])
+
+    if embedding_matrix == None:
+        # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
+        # numpy_rng = np.random.RandomState(4321)
+        # embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(config.max_features, config.embedding_dims))
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    input_length=config.maxlen)
+
+    else:
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    weights=[embedding_matrix],
+                                    input_length=config.maxlen,
+                                    trainable=False)
+
+    sequence_input = Input(shape=(config.maxlen,), dtype='int32')
+    embedded_sequences = embedding_layer(sequence_input)
+
+    x = Bidirectional(LSTM(config.lstm_output_size))(embedded_sequences)
+    x = Dropout(config.dropout)(x)
+    preds = Dense(1, activation='sigmoid')(x)
+    model = Model(inputs=sequence_input, outputs=preds)
+
+    # model = Sequential()
+    # model.add(Embedding(config.max_features, config.embedding_dims, input_length=config.maxlen))
+    # model.add(Bidirectional(LSTM(config.lstm_output_size)))
+    # model.add(Dropout(config.dropout))
+    # model.add(Dense(1, activation='sigmoid'))
+
+    model.compile(loss='binary_crossentropy',
+                  optimizer='nadam',
+                  metrics=['acc'])
     model.summary()
     return model
 
-def cnn_lstm(config):
+def cnn_lstm(config, embedding_matrix=None):
     """CNN LSTM model
 
     :param config:
@@ -115,18 +143,47 @@ def cnn_lstm(config):
     """
 
     print("Build CNN LSTM model...")
-    model = Sequential()
-    model.add(Embedding(config.max_features, config.embedding_dims, input_length=config.maxlen))
-    model.add(Dropout(config.dropout))
-    model.add(Conv1D(nb_filter=config.nb_filter,
-                     filter_length=config.filter_length,
-                     border_mode='valid',
-                     activation='relu',
-                     subsample_length=1))
-    model.add(MaxPooling1D(pool_length=config.pool_length))
-    model.add(LSTM(config.lstm_output_size))
-    model.add(Dense(1))
-    model.add(Activation('sigmoid'))
+
+    if embedding_matrix == None:
+        # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
+        # numpy_rng = np.random.RandomState(4321)
+        # embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(config.max_features, config.embedding_dims))
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    input_length=config.maxlen)
+
+    else:
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    weights=[embedding_matrix],
+                                    input_length=config.maxlen,
+                                    trainable=False)
+
+    sequence_input = Input(shape=(config.maxlen,), dtype='int32')
+    embedded_sequences = embedding_layer(sequence_input)
+    x = Dropout(config.dropout)(embedded_sequences)
+    x = Conv1D(nb_filter=config.nb_filter,
+               filter_length=config.filter_length,
+               border_mode='valid',
+               activation='relu',
+               subsample_length=1)(x)
+    x = MaxPooling1D(pool_length=config.pool_length)(x)
+    x = LSTM(config.lstm_output_size)(x)
+    preds = Dense(1, activation='sigmoid')(x)
+    model = Model(inputs=sequence_input, outputs=preds)
+
+    # model = Sequential()
+    # model.add(Embedding(config.max_features, config.embedding_dims, input_length=config.maxlen))
+    # model.add(Dropout(config.dropout))
+    # model.add(Conv1D(nb_filter=config.nb_filter,
+    #                  filter_length=config.filter_length,
+    #                  border_mode='valid',
+    #                  activation='relu',
+    #                  subsample_length=1))
+    # model.add(MaxPooling1D(pool_length=config.pool_length))
+    # model.add(LSTM(config.lstm_output_size))
+    # model.add(Dense(1))
+    # model.add(Activation('sigmoid'))
 
     model.compile(loss='binary_crossentropy',
                   optimizer='adam',
@@ -134,40 +191,71 @@ def cnn_lstm(config):
     model.summary()
     return model
 
-def cnn(config):
+def cnn(config, embedding_matrix=None):
     """CNN model
 
     :param config:
     :return: the model
     """
     print('Build CNN model...')
-    model = Sequential()
 
-    # we start off with an efficient embedding layer which maps
-    # our vocab indices into embedding_dims dimensions
-    model.add(Embedding(config.max_features,
-                        config.embedding_dims,
-                        input_length=config.maxlen,
-                        dropout=config.dropout))
+    if embedding_matrix == None:
+        # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
+        # numpy_rng = np.random.RandomState(4321)
+        # embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(config.max_features, config.embedding_dims))
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    input_length=config.maxlen)
 
-    # we add a Convolution1D, which will learn nb_filter
-    # word group filters of size filter_length:
-    model.add(Conv1D(nb_filter=config.nb_filter,
-                     filter_length=config.filter_length,
-                     border_mode='valid',
-                     activation='relu',
-                     subsample_length=1))
-    # we use max pooling:
-    model.add(GlobalMaxPooling1D())
+    else:
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    weights=[embedding_matrix],
+                                    input_length=config.maxlen,
+                                    trainable=False)
 
-    # We add a vanilla hidden layer:
-    model.add(Dense(config.hidden_dims))
-    model.add(Dropout(config.dropout))
-    model.add(Activation('relu'))
+    sequence_input = Input(shape=(config.maxlen,), dtype='int32')
+    embedded_sequences = embedding_layer(sequence_input)
 
-    # We project onto a single unit output layer, and squash it with a sigmoid:
-    model.add(Dense(1))
-    model.add(Activation('sigmoid'))
+    x = Conv1D(nb_filter=config.nb_filter,
+               filter_length=config.filter_length,
+               border_mode='valid',
+               activation='relu',
+               subsample_length=1)(embedded_sequences)
+    x = GlobalMaxPooling1D()(x)
+    x = Dense(config.hidden_dims, activation='relu')(x)
+    x = Dropout(config.dropout)(x)
+    preds = Dense(1, activation='sigmoid')(x)
+
+    model = Model(inputs=sequence_input, outputs=preds)
+
+    # model = Sequential()
+    #
+    # # we start off with an efficient embedding layer which maps
+    # # our vocab indices into embedding_dims dimensions
+    # model.add(Embedding(config.max_features,
+    #                     config.embedding_dims,
+    #                     input_length=config.maxlen,
+    #                     dropout=config.dropout))
+    #
+    # # we add a Convolution1D, which will learn nb_filter
+    # # word group filters of size filter_length:
+    # model.add(Conv1D(nb_filter=config.nb_filter,
+    #                  filter_length=config.filter_length,
+    #                  border_mode='valid',
+    #                  activation='relu',
+    #                  subsample_length=1))
+    # # we use max pooling:
+    # model.add(GlobalMaxPooling1D())
+    #
+    # # We add a vanilla hidden layer:
+    # model.add(Dense(config.hidden_dims))
+    # model.add(Dropout(config.dropout))
+    # model.add(Activation('relu'))
+    #
+    # # We project onto a single unit output layer, and squash it with a sigmoid:
+    # model.add(Dense(1))
+    # model.add(Activation('sigmoid'))
 
     model.compile(loss='binary_crossentropy',
                   optimizer='nadam',
@@ -175,18 +263,42 @@ def cnn(config):
     model.summary()
     return model
 
-def lstm(config):
+def lstm(config, embedding_matrix=None):
     """LSTM model
 
     :param config:
     :return: the model
     """
     print('Build LSTM model...')
-    model = Sequential()
-    model.add(Embedding(config.max_features, config.embedding_dims))
-    model.add(LSTM(config.lstm_output_size, dropout=config.dropout, recurrent_dropout=config.dropout))  # try using a GRU instead, for fun
-    model.add(Dense(1))
-    model.add(Activation('sigmoid'))
+
+    if embedding_matrix == None:
+        # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
+        # numpy_rng = np.random.RandomState(4321)
+        # embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(config.max_features, config.embedding_dims))
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    input_length=config.maxlen)
+
+    else:
+        embedding_layer = Embedding(config.max_features,
+                                    config.embedding_dims,
+                                    weights=[embedding_matrix],
+                                    input_length=config.maxlen,
+                                    trainable=False)
+
+    sequence_input = Input(shape=(config.maxlen,), dtype='int32')
+    embedded_sequences = embedding_layer(sequence_input)
+
+    x = LSTM(config.lstm_output_size, dropout=config.dropout, recurrent_dropout=config.dropout)(embedded_sequences)
+    preds = Dense(1, activation='sigmoid')(x)
+
+    model = Model(inputs=sequence_input, outputs=preds)
+
+    # model = Sequential()
+    # model.add(Embedding(config.max_features, config.embedding_dims))
+    # model.add(LSTM(config.lstm_output_size, dropout=config.dropout, recurrent_dropout=config.dropout))  # try using a GRU instead, for fun
+    # model.add(Dense(1))
+    # model.add(Activation('sigmoid'))
 
     print('Sucessfully built...')
 

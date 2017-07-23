@@ -24,18 +24,23 @@ def train(config):
     print('Train...')
 
     if config.model_name == 'bidirectional_lstm':
-        model = bidirectional_lstm(config)
+        # model = bidirectional_lstm(config)
+        model = bidirectional_lstm(config, embedding_matrix)
 
     elif config.model_name == 'cnn':
-        model = cnn(config)
+        # model = cnn(config)
+        model = cnn(config, embedding_matrix)
 
     elif config.model_name == 'cnn_lstm':
-        model = cnn_lstm(config)
+        # model = cnn_lstm(config)
+        model = cnn_lstm(config, embedding_matrix)
 
     elif config.model_name == 'lstm':
-        model = lstm(config)
+        # model = lstm(config)
+        model = lstm(config, embedding_matrix)
 
     elif config.model_name == 'cnn_based_rnn':
+        # model = cnn_based_rnn(config)
         model = cnn_based_rnn(config, embedding_matrix)
 
     else:
