@@ -38,6 +38,7 @@ class Data_Loader(object):
                 label.append(0)
 
         print("neg data is", len(data))
+        # print("example of neg:\n", data[0])
 
         print("Loading pos...")
         for pos in pos_list:
@@ -47,6 +48,7 @@ class Data_Loader(object):
                 label.append(1)
 
         print("all data is", len(data))
+        # print("example of pos:\n", data[-1])
 
         return data, label
 

@@ -36,6 +36,8 @@ class Pre_Process(object):
         y_test = np.array(y_test)
         print('y_train shape:', y_train.shape)
         print('y_test shape:', y_test.shape)
+        # print('sample of train:\n', X_train[0])
+        # print('sample of test:\n', X_test[0])
 
         return  X_train, y_train, X_test, y_test
 
@@ -46,16 +48,22 @@ class Pre_Process(object):
         :param data_loader:
         :return: X_train, y_train, X_test, y_test, word_index
         """
+
         X_train, y_train = data_loader.load_from_file(config, 'train')
         X_test, y_test = data_loader.load_from_file(config, 'test')
+        
         new_X = []
         for X in X_train:
-            new_X.append(self.text_to_wordlist(X.strip()))
+            tmp = self.text_to_wordlist(X.strip(), True)
+            new_X.append(tmp)
+        print(tmp)
         X_train = new_X
 
         new_X = []
         for X in X_test:
-            new_X.append(self.text_to_wordlist(X))
+            tmp = self.text_to_wordlist(X.strip(), True)
+            new_X.append(tmp)
+        print(tmp)
         X_test = new_X
 
         tokenizer = Tokenizer(num_words=config.max_features)
@@ -76,9 +84,12 @@ class Pre_Process(object):
         print('y_train shape:', y_train.shape)
         print('y_test shape:', y_test.shape)
 
+        # print('sample of train:\n', X_train[0])
+        # print('sample of test:\n', X_test[0])
+
         return X_train, y_train, X_test, y_test, word_index
 
-    def text_to_wordlist(text, remove_stopwords=False, stem_words=False):
+    def text_to_wordlist(self, text, remove_stopwords=False, stem_words=False):
         # Clean the text, with the option to remove stopwords and to stem words.
 
         # Convert words to lower case and split them
@@ -121,6 +132,7 @@ class Pre_Process(object):
         text = re.sub(r"\.", " ", text)
         text = re.sub(r"\!", " ! ", text)
         text = re.sub(r"\/", " ", text)
+        text = re.sub(r"\\", " ", text)
         text = re.sub(r"\^", " ^ ", text)
         text = re.sub(r"\+", " + ", text)
         text = re.sub(r"\-", " - ", text)
@@ -188,12 +200,17 @@ class Pre_Process(object):
             text = " ".join(stemmed_words)
 
         # Return a list of words
-        return (text)
+        return text
 
     def test(self):
-        config = Config()
+        config = Config(max_feature=200000, maxlen=400, embedding_dims=300,
+                        embedding_file='/home/irlab0/Research/kaggle/Quora_Question_Pairs/data/glove.840B.300d.txt',
+                        trian_path='/home/irlab0/Research/TextClassification/imdb/data/aclImdb/train/',
+                        test_path='/home/irlab0/Research/TextClassification/imdb/data/aclImdb/test/')
         data_loader = Data_Loader()
-        X_train, y_train, X_test, y_test = self.process(config, data_loader)
+        # X_train, y_train, X_test, y_test = self.process(config, data_loader)
+        X_train, y_train, X_test, y_test, word_index = self.process_from_file(config, data_loader)
+        config.get_embedding_matrix(word_index)
         print(X_train[0])
         print(y_train[0])
 

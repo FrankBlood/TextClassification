@@ -55,6 +55,7 @@ class Config(object):
         print('Preparing embedding matrix')
 
         nb_words = min(self.max_features, len(word_index)) + 1
+        self.max_features = nb_words
 
         # embedding_matrix = np.zeros((nb_words, EMBEDDING_DIM))
         numpy_rng = np.random.RandomState(4321)
@@ -72,6 +73,8 @@ class Config(object):
             if word in embeddings_from_file:
                 embedding_matrix[i] = embeddings_from_file[word]
                 count += 1
+        print('nb words is', nb_words)
+        print('num of word embeddings:', count)
         print('Null word embeddings: %d' % (nb_words - count))
 
         return embedding_matrix
@@ -81,6 +84,23 @@ class Config(object):
         pass
 
     def print_config(self):
+        config_string = ('max_features ' + str(self.max_features) +
+                         ' maxlen ' + str(self.maxlen) +
+                         ' batch_size ' + str(self.batch_size) +
+                         ' embedding_dims ' + str(self.embedding_dims) +
+                         ' nb_filter ' + str(self.nb_filter) +
+                         ' filter_length ' + str(self.filter_length) +
+                         ' hidden_dims ' + str(self.hidden_dims) +
+                         ' nb_epoch ' + str(self.nb_epoch) +
+                         ' dropout ' + str(self.dropout) +
+                         ' pool_length ' + str(self.pool_length) +
+                         ' lstm_output_size ' + str(self.lstm_output_size) +
+                         ' model_name ' + str(self.model_name) +
+                         ' embedding_file ' + str(self.embedding_file) +
+                         ' word_vocb_path ' + str(self.word_vocb_path) +
+                         ' trian_path ' + str(self.train_path) +
+                         ' test_path ' + str(self.test_path)
+                         )
         print('max_features', self.max_features)
         print('maxlen', self.maxlen)
         print('batch_size', self.batch_size)
@@ -93,6 +113,7 @@ class Config(object):
         print('pool_length', self.pool_length)
         print('lstm_output_size', self.lstm_output_size)
         print('model_name', self.model_name)
+        return config_string
 
 if __name__ == '__main__':
     config = Config()
