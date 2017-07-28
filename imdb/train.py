@@ -43,6 +43,24 @@ def train(config):
         # model = cnn_based_rnn(config)
         model = cnn_based_rnn(config, embedding_matrix)
 
+    elif config.model_name == 'complex_cnn_based_rnn':
+        model = complex_cnn_based_rnn(config, embedding_matrix)
+
+    elif config.model_name == 'cnn_add_rnn':
+        model = cnn_add_rnn(config, embedding_matrix)
+
+    elif config.model_name == 'cnn_inner_rnn':
+        model = cnn_inner_rnn(config, embedding_matrix)
+
+    elif config.model_name == 'rnn_inner_rnn':
+        model = rnn_inner_rnn(config, embedding_matrix)
+
+    elif config.model_name == 'rnn_cat_rnn':
+        model = rnn_cat_rnn(config, embedding_matrix)
+
+    elif config.model_name == 'pre_attention_inner_rnn':
+        model = pre_attention_inner_rnn(config, embedding_matrix)
+    
     else:
         print("What the FUCK!")
         return
@@ -57,13 +75,13 @@ def train(config):
               batch_size=config.batch_size,
               nb_epoch=config.nb_epoch, shuffle=True,
               validation_data=[X_test, y_test],
+              # callbacks=[model_checkpoint])
               callbacks=[early_stopping, model_checkpoint])
 
     if os.path.exists(bst_model_path):
         model.load_weights(bst_model_path)
 
     print('test:', model.evaluate(X_test, y_test, batch_size=config.batch_size))
-
 
 def main():
     print('Configurations:')
