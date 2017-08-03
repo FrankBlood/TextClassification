@@ -1,3 +1,6 @@
 ./imdb/models
 ./imdb/logs
 ./imdb/data
+./yelp/models
+./yelp/logs
+./yelp/data

@@ -16,6 +16,7 @@ from keras.layers.advanced_activations import PReLU
 
 from config import Config
 
+
 def pre_attention_inner_rnn(config, embedding_matrix=None):
     """Pre Attention INNER RNN
 
@@ -124,12 +125,12 @@ def rnn_cat_rnn(config, embedding_matrix=None):
                     dropout=config.dropout,
                     recurrent_dropout=config.dropout)(embedded_sequences)
 
-    attention = Dense(300, activation='relu')(attention)
+    # attention = Dense(300, activation='relu')(attention)
 
     attention = RepeatVector(config.maxlen)(attention)
 
-    x = concatenate([embedded_sequences, attention])
-    # x = multiply([embedded_sequences, attention])
+    # x = concatenate([embedded_sequences, attention])
+    x = multiply([embedded_sequences, attention])
 
     ########################################
     ## Common RNN Model -- GRU
@@ -209,6 +210,7 @@ def rnn_inner_rnn(config, embedding_matrix=None):
     # plot_model(model, to_file=config.model_name+'.png')
     return model
 
+
 def cnn_inner_rnn(config, embedding_matrix=None):
     """CNN Attentive INNER RNN Model
 
@@ -272,6 +274,7 @@ def cnn_inner_rnn(config, embedding_matrix=None):
     model.summary()
     # plot_model(model, to_file=config.model_name+'.png')
     return model
+
 
 def cnn_add_rnn(config, embedding_matrix=None):
     """CNN add Attentive RNN Model
@@ -354,6 +357,7 @@ def cnn_add_rnn(config, embedding_matrix=None):
     model.summary()
     # plot_model(model, to_file=config.model_name+'.png')
     return model
+
 
 def complex_cnn_based_rnn(config, embedding_matrix=None):
     '''Complex CNN based RNN
@@ -478,6 +482,7 @@ def complex_cnn_based_rnn(config, embedding_matrix=None):
     model.summary()
     return model
 
+
 def cnn_based_rnn(config, embedding_matrix=None):
     """CNN based Attentive RNN Model
 
@@ -502,18 +507,27 @@ def cnn_based_rnn(config, embedding_matrix=None):
                                     input_length=config.maxlen,
                                     trainable=False)
 
+    ########################################
+    ## All Used Layers
+    ########################################
     rnn_layer = Bidirectional(GRU(config.lstm_output_size, dropout=config.dropout, recurrent_dropout=config.dropout))
     cnn_layer = Conv1D(activation="relu", padding="valid", strides=1, filters=config.nb_filter, kernel_size=config.filter_length)
     pooling_layer = GlobalMaxPooling1D()
-    cnn_dense = Dense(config.hidden_dims)
+    cnn_dense = Dense(config.hidden_dims, activation='relu')
     cnn_dropout1 = Dropout(config.dropout)
     cnn_dropout2 = Dropout(config.dropout)
     cnn_batchnormalization = BatchNormalization()
-    cnn_dense1 = Dense(config.hidden_dims, activation='relu')
+    cnn_dense1 = Dense(config.hidden_dims)
 
+    ########################################
+    ## Input and Embedding
+    ########################################
     sequence_input = Input(shape=(config.maxlen,), dtype='int32')
     embedded_sequences = embedding_layer(sequence_input)
 
+    ########################################
+    ## Attention Layer: CNN
+    ########################################
     cnn = cnn_layer(embedded_sequences)
     cnn = pooling_layer(cnn)
     cnn = cnn_dropout1(cnn)
@@ -521,24 +535,22 @@ def cnn_based_rnn(config, embedding_matrix=None):
     cnn = cnn_dropout2(cnn)
     cnn = cnn_batchnormalization(cnn)
 
+    ########################################
+    ## Attention Action
+    ########################################
     cnn_t = cnn_dense1(cnn)
-
     a = multiply([cnn_t, embedded_sequences])
-
     a = Permute([2, 1])(a)
-
     a = Lambda(lambda x: K.sum(x, axis=1))(a)
-
     a = Activation('sigmoid')(a)
-
     embedded_sequences = Permute([2, 1])(embedded_sequences)
-
     x = multiply([a, embedded_sequences])
-
     x = Permute([2, 1])(x)
 
+    ########################################
+    ## Output Layers
+    ########################################
     x = rnn_layer(x)
-
     x = Dense(config.hidden_dims, activation='relu')(x)
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
@@ -554,6 +566,7 @@ def cnn_based_rnn(config, embedding_matrix=None):
                   metrics=['acc'])
     model.summary()
     return model
+
 
 def bidirectional_lstm(config, embedding_matrix=None):
     """ Bidirectional LSTM model
@@ -597,6 +610,7 @@ def bidirectional_lstm(config, embedding_matrix=None):
                   metrics=['acc'])
     model.summary()
     return model
+
 
 def cnn_lstm(config, embedding_matrix=None):
     """CNN LSTM model
@@ -653,6 +667,7 @@ def cnn_lstm(config, embedding_matrix=None):
                   metrics=['accuracy'])
     model.summary()
     return model
+
 
 def cnn(config, embedding_matrix=None):
     """CNN model
@@ -726,6 +741,7 @@ def cnn(config, embedding_matrix=None):
     model.summary()
     return model
 
+
 def lstm(config, embedding_matrix=None):
     """LSTM model
 
@@ -771,6 +787,7 @@ def lstm(config, embedding_matrix=None):
                   metrics=['accuracy'])
     model.summary()
     return model
+
 
 if __name__ == '__main__':
     config = Config(max_feature=102153, maxlen=2570,
