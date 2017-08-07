@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import os
+import random
 import numpy as np
 import pandas as pd
 import json
@@ -15,29 +16,6 @@ class Data_Loader(object):
         print('Loading data...')
 
     def load_from_file(self, config):
-        '''
-
-        :param config:
-        :return:
-        '''
-
-        data = []
-        label = []
-
-        print("Load data...")
-        with codecs.open(config.data_path, encoding='utf8') as fp:
-            for line in fp.readlines():
-                json_data = json.loads(line.strip())
-                text = json_data['text']
-                stars = json_data['stars']
-                data.append(text.strip())
-                label.append([int(stars)-1])
-
-        print("all data is", len(data))
-        # print("all label is", set(label))
-        return data, label
-
-    def split(self, config, rate=0.2):
         '''
 
         :param config:

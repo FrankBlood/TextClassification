@@ -2,7 +2,8 @@
 
 from __future__ import print_function
 import numpy as np
-
+import codecs
+import json
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from nltk.stem.porter import *
@@ -20,7 +21,126 @@ class Pre_Process(object):
     def __init__(self):
         print('pre processing...')
 
-    def process_from_file(self, config, data_loader):
+    def process(self, config):
+        """Process from raw file
+
+        :param config:
+        :param data_loader:
+        :return: X_train, y_train, X_test, y_test, word_index
+
+        """
+
+        feature = []
+        label = []
+
+        print("Load data...")
+        with codecs.open(config.data_path, encoding='utf8') as fp:
+            for line in fp.readlines():
+                json_data = json.loads(line.strip())
+                text = json_data['text']
+                stars = json_data['stars']
+                text = self.text_to_wordlist(text.strip(), True)
+                feature.append(text.strip())
+                label.append([int(stars) - 1])
+
+        print("all data is", len(feature))
+
+        tokenizer = Tokenizer(num_words=config.max_features)
+        tokenizer.fit_on_texts(feature)
+
+        word_index = tokenizer.word_index
+        print('Found %s unique tokens' % len(word_index))
+
+        X_sequences = tokenizer.texts_to_sequences(feature)
+
+        word_index = tokenizer.word_index
+        print('Found %s unique tokens' % len(word_index))
+
+        X = sequence.pad_sequences(X_sequences, maxlen=config.maxlen)
+        print('X_train shape:', X.shape)
+        y = to_categorical(label, num_classes=5)
+        X_val = X[:830630]
+        y_val = y[:830630]
+
+        X_train = X[830630:-830630]
+        y_train = y[830630:-830630]
+
+        X_test = X[-830630:]
+        y_test = X[-830630:]
+
+        return np.array(X_train), np.array(y_train), np.array(X_val), np.array(y_val), np.array(X_test), np.array(y_test), word_index
+
+    def get_tokenizer(self, config):
+
+        feature = []
+        label = []
+
+        print("Load data...")
+        with codecs.open(config.data_path, encoding='utf8') as fp:
+            for line in fp.readlines():
+                json_data = json.loads(line.strip())
+                text = json_data['text']
+                stars = json_data['stars']
+                text = self.text_to_wordlist(text.strip(), True)
+                feature.append(text.strip())
+                label.append([int(stars) - 1])
+
+        print("all data is", len(feature))
+
+        tokenizer = Tokenizer(num_words=config.max_features)
+        tokenizer.fit_on_texts(feature)
+
+        word_index = tokenizer.word_index
+        print('Found %s unique tokens' % len(word_index))
+
+        return tokenizer, word_index
+
+    def process_from_file(self, config, tokenizer, mode='train'):
+        """Process from raw file
+
+        :param config:
+        :param data_loader:
+        :return: X_train, y_train, X_test, y_test, word_index
+
+        """
+
+        if mode == 'train':
+            path = config.train_path
+        elif mode == 'validation':
+            path = config.val_path
+        elif mode == 'test':
+            path = config.test_path
+        else:
+            print("What the fuck!")
+            return None
+
+        feature = []
+        label = []
+
+        print("Load data...")
+        with codecs.open(path, encoding='utf8') as fp:
+            for line in fp.readlines():
+                json_data = json.loads(line.strip())
+                text = json_data['text']
+                stars = json_data['stars']
+                text = self.text_to_wordlist(text.strip(), True)
+                feature.append(text.strip())
+                label.append([int(stars) - 1])
+
+        print("all data is", len(feature))
+
+        X_sequences = tokenizer.texts_to_sequences(feature)
+
+        word_index = tokenizer.word_index
+        print('Found %s unique tokens' % len(word_index))
+
+        X = sequence.pad_sequences(X_sequences, maxlen=config.maxlen)
+        print('X_train shape:', X.shape)
+        y = to_categorical(label, num_classes=5)
+
+        return np.array(X), np.array(y), word_index
+
+    def process_from_file_old(self, config, data_loader):
         """Process from raw file
 
         :param config:

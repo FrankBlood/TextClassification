@@ -11,7 +11,10 @@ class Config(object):
                  filter_length=3, hidden_dims=250, nb_epoch=2, dropout=0.2,
                  pool_length=4, lstm_output_size=70, model_name='model',
                  embedding_file=None, word_vocb_path=None,
-                 data_path='./data/yelp_academic_dataset_review.json'):
+                 data_path='./data/all_data',
+                 train_path='./data/train_data',
+                 val_path = './data/val_data',
+                 test_path = './data/test_data'):
 
         print("config setting...")
         self.max_features = max_feature
@@ -29,6 +32,9 @@ class Config(object):
         self.embedding_file = embedding_file
         self.word_vocb_path = word_vocb_path
         self.data_path = data_path
+        self.train_path = train_path
+        self.val_path = val_path
+        self.test_path = test_path
 
     def get_word_index(self):
         print('Preparing word index...')

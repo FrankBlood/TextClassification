@@ -76,8 +76,8 @@ def train(config):
               nb_epoch=config.nb_epoch, shuffle=True,
               validation_split=0.1,
               # validation_data=[X_test, y_test],
-              # callbacks=[model_checkpoint])
-              callbacks=[early_stopping, model_checkpoint])
+              callbacks=[model_checkpoint])
+              # callbacks=[early_stopping, model_checkpoint])
 
     if os.path.exists(bst_model_path):
         model.load_weights(bst_model_path)

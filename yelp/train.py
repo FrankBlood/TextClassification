@@ -18,7 +18,7 @@ def train(config):
     data_loader = Data_Loader()
     pre_process = Pre_Process()
     # X_train, y_train, X_test, y_test = pre_process.process(config, data_loader)
-    X_train, y_train, word_index = pre_process.process_from_file(config, data_loader)
+    X_train, y_train, X_val, y_val, X_test, y_test, word_index = pre_process.process(config)
     embedding_matrix = config.get_embedding_matrix(word_index)
 
     print('Train...')
@@ -74,14 +74,14 @@ def train(config):
     model.fit(X_train, y_train,
               batch_size=config.batch_size,
               nb_epoch=config.nb_epoch, shuffle=True,
-              validation_split=0.2,
+              validation_data=(X_val, y_val),
               # callbacks=[model_checkpoint])
               callbacks=[early_stopping, model_checkpoint])
 
     if os.path.exists(bst_model_path):
         model.load_weights(bst_model_path)
 
-    # print('test:', model.evaluate(X_test, y_test, batch_size=config.batch_size))
+    print('test:', model.evaluate(X_test, y_test, batch_size=config.batch_size))
 
 def main():
     print('Configurations:')
