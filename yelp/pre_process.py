@@ -44,20 +44,20 @@ class Pre_Process(object):
         word_index = tokenizer.word_index
         print('Found %s unique tokens' % len(word_index))
 
-        X_train = sequence.pad_sequences(X_train_sequences, maxlen=config.maxlen)
-        print('X_train shape:', X_train.shape)
-        y_train = np.array(y)
-        print('y_train shape:', y_train.shape)
-
+        X = sequence.pad_sequences(X_train_sequences, maxlen=config.maxlen)
+        print('X_train shape:', X.shape)
         y = to_categorical(y, num_classes=5)
 
-        return X_train, y_train, word_index
+        return np.array(X), np.array(y), word_index
 
     def text_to_wordlist(self, text, remove_stopwords=False, stem_words=False):
         # Clean the text, with the option to remove stopwords and to stem words.
 
         # Convert words to lower case and split them
-        text = str(text).lower()
+        try:
+            text = str(text.encode('utf8')).lower()
+        except:
+            text = str(text.encode('gbk')).lower()
 
         # Optionally, remove stop words
         if remove_stopwords:
@@ -166,18 +166,13 @@ class Pre_Process(object):
         # Return a list of words
         return text
 
-    def test(self):
-        config = Config(max_feature=200000, maxlen=400, embedding_dims=300,
-                        embedding_file='/home/irlab0/Research/kaggle/Quora_Question_Pairs/data/glove.840B.300d.txt',
-                        trian_path='/home/irlab0/Research/TextClassification/imdb/data/aclImdb/train/',
-                        test_path='/home/irlab0/Research/TextClassification/imdb/data/aclImdb/test/')
-        data_loader = Data_Loader()
-        # X_train, y_train, X_test, y_test = self.process(config, data_loader)
-        X_train, y_train, X_test, y_test, word_index = self.process_from_file(config, data_loader)
-        config.get_embedding_matrix(word_index)
-        print(X_train[0])
-        print(y_train[0])
+def test():
+    config = Config(max_feature=200000, maxlen=400, embedding_dims=300,
+                    embedding_file='/home/hegx/Research/Quora_Question_Pairs/data/glove.840B.300d.txt')
+    data_loader = Data_Loader()
+    pre_process = Pre_Process()
+    X, y, word_index = pre_process.process_from_file(config, data_loader)
+    config.get_embedding_matrix(word_index)
 
 if __name__ == "__main__":
-    pre_process = Pre_Process()
-    pre_process.test()
+    test()

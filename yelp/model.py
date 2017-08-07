@@ -72,18 +72,16 @@ def pre_attention_inner_rnn(config, embedding_matrix=None):
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
 
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     ########################################
     ## train the model
     ########################################
     model = Model(inputs=sequence_input, outputs=preds)
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
-    model.load_weights('./models/pre_model.h5', by_name=True)
     model.summary()
-    # plot_model(model, to_file=config.model_name+'.png')
     return model
 
 
@@ -143,17 +141,16 @@ def rnn_cat_rnn(config, embedding_matrix=None):
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
 
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     ########################################
     ## train the model
     ########################################
     model = Model(inputs=sequence_input, outputs=preds)
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
     model.summary()
-    # plot_model(model, to_file=config.model_name+'.png')
     return model
 
 
@@ -197,17 +194,16 @@ def rnn_inner_rnn(config, embedding_matrix=None):
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
 
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     ########################################
     ## train the model
     ########################################
     model = Model(inputs=sequence_input, outputs=preds)
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
     model.summary()
-    # plot_model(model, to_file=config.model_name+'.png')
     return model
 
 
@@ -262,17 +258,16 @@ def cnn_inner_rnn(config, embedding_matrix=None):
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
 
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     ########################################
     ## train the model
     ########################################
     model = Model(inputs=sequence_input, outputs=preds)
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
     model.summary()
-    # plot_model(model, to_file=config.model_name+'.png')
     return model
 
 
@@ -345,13 +340,13 @@ def cnn_add_rnn(config, embedding_matrix=None):
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
 
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     ########################################
     ## train the model
     ########################################
     model = Model(inputs=sequence_input, outputs=preds)
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
     model.summary()
@@ -470,13 +465,13 @@ def complex_cnn_based_rnn(config, embedding_matrix=None):
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
 
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     ########################################
     ## train the model
     ########################################
     model = Model(inputs=sequence_input, outputs=preds)
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
     model.summary()
@@ -555,13 +550,13 @@ def cnn_based_rnn(config, embedding_matrix=None):
     x = Dropout(config.dropout)(x)
     x = BatchNormalization()(x)
 
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     ########################################
     ## train the model
     ########################################
     model = Model(inputs=sequence_input, outputs=preds)
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
     model.summary()
@@ -596,7 +591,7 @@ def bidirectional_lstm(config, embedding_matrix=None):
 
     x = Bidirectional(LSTM(config.lstm_output_size))(embedded_sequences)
     x = Dropout(config.dropout)(x)
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
     model = Model(inputs=sequence_input, outputs=preds)
 
     # model = Sequential()
@@ -605,7 +600,7 @@ def bidirectional_lstm(config, embedding_matrix=None):
     # model.add(Dropout(config.dropout))
     # model.add(Dense(1, activation='sigmoid'))
 
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
     model.summary()
@@ -646,7 +641,7 @@ def cnn_lstm(config, embedding_matrix=None):
                subsample_length=1)(x)
     x = MaxPooling1D(pool_length=config.pool_length)(x)
     x = LSTM(config.lstm_output_size)(x)
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
     model = Model(inputs=sequence_input, outputs=preds)
 
     # model = Sequential()
@@ -662,7 +657,7 @@ def cnn_lstm(config, embedding_matrix=None):
     # model.add(Dense(1))
     # model.add(Activation('sigmoid'))
 
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy'])
     model.summary()
@@ -703,7 +698,7 @@ def cnn(config, embedding_matrix=None):
     x = GlobalMaxPooling1D()(x)
     x = Dense(config.hidden_dims, activation='relu')(x)
     x = Dropout(config.dropout)(x)
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     model = Model(inputs=sequence_input, outputs=preds)
 
@@ -735,7 +730,7 @@ def cnn(config, embedding_matrix=None):
     # model.add(Dense(1))
     # model.add(Activation('sigmoid'))
 
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='nadam',
                   metrics=['accuracy'])
     model.summary()
@@ -769,7 +764,7 @@ def lstm(config, embedding_matrix=None):
     embedded_sequences = embedding_layer(sequence_input)
 
     x = LSTM(config.lstm_output_size, dropout=config.dropout, recurrent_dropout=config.dropout)(embedded_sequences)
-    preds = Dense(1, activation='sigmoid')(x)
+    preds = Dense(5, activation='softmax')(x)
 
     model = Model(inputs=sequence_input, outputs=preds)
 
@@ -782,7 +777,7 @@ def lstm(config, embedding_matrix=None):
     print('Sucessfully built...')
 
     # try using different optimizers and different optimizer configs
-    model.compile(loss='binary_crossentropy',
+    model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy'])
     model.summary()
@@ -799,10 +794,10 @@ if __name__ == '__main__':
     # model = cnn(config)
     # model = cnn_lstm(config)
     # model = lstm(config)
-    # model = cnn_based_rnn(config)
+    model = cnn_based_rnn(config)
     # model = cnn_add_rnn(config)
     # model = complex_cnn_based_rnn(config)
     # model = cnn_inner_rnn(config)
     # model = rnn_inner_rnn(config)
     # model = rnn_cat_rnn(config)
-    model = pre_attention_inner_rnn(config)
+    # model = pre_attention_inner_rnn(config)

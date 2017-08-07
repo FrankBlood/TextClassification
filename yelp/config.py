@@ -6,7 +6,7 @@ import numpy as np
 
 class Config(object):
 
-    def __init__(self, max_feature=102153, maxlen=2570,
+    def __init__(self, max_feature=102153, maxlen=120,
                  batch_size=50, embedding_dims=50, nb_filter=250,
                  filter_length=3, hidden_dims=250, nb_epoch=2, dropout=0.2,
                  pool_length=4, lstm_output_size=70, model_name='model',
