@@ -74,7 +74,8 @@ def train(config):
     model.fit(X_train, y_train,
               batch_size=config.batch_size,
               nb_epoch=config.nb_epoch, shuffle=True,
-              validation_data=[X_test, y_test],
+              validation_split=0.1,
+              # validation_data=[X_test, y_test],
               # callbacks=[model_checkpoint])
               callbacks=[early_stopping, model_checkpoint])
 
