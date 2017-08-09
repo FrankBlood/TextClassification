@@ -66,7 +66,7 @@ class Pre_Process(object):
         y_train = y[830630:-830630]
 
         X_test = X[-830630:]
-        y_test = X[-830630:]
+        y_test = y[-830630:]
 
         return np.array(X_train), np.array(y_train), np.array(X_val), np.array(y_val), np.array(X_test), np.array(y_test), word_index
 
